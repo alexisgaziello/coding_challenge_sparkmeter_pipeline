@@ -17,18 +17,20 @@ class Pipeline():
     
     def __init__(self, *args, **kwargs):
         
-        if SLEEP_DURATION is not None:
-            self.default_sleep_duration = SLEEP_DURATION
-        # Couldn't retrieve sleep duration from environment.
-        # Let's try from constructor.
-        else:
-            # We want to ensure that a default sleep duration exists
-            # I am using kwargs instead of putting a parameter, in order to use the current infrastructure
-            # Since I consider default sleep duration a necessary a parameter, an error is raised
-            # if the value is not set.
-            try:
-                self.default_sleep_duration = kwargs["default_sleep_duration"]
-            except:
+        # We want to ensure that a default sleep duration exists
+        # 1. We try to use kwargs, in case it's passed as argument.
+        # 2. We tried the environment variable.
+        # 3. None of the above, we raise an error.
+
+        # I am using kwargs instead of a parameter, in order to use the current kwarg infrastructure
+        try:
+            self.default_sleep_duration = kwargs["default_sleep_duration"]
+        except:
+            if SLEEP_DURATION is not None:
+                self.default_sleep_duration = SLEEP_DURATION
+            
+            else:
+                # Couldn't retrieve sleep duration.
                 raise ValueError("Please specify a default sleep duration with the parameter 'default_sleep_duration'.")
 
         self.loop = asyncio.get_event_loop()
@@ -84,4 +86,4 @@ if __name__ == "__main__":
         await asyncio.sleep(kwargs["delay"])
         print(kwargs["what"])
 
-    pipeline.sleep_for(say_after, delay=0, what="Hello World!")
+    pipeline.sleep_for(say_after, delay=1, what="Hello World!")
